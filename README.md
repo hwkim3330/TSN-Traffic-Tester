@@ -9,6 +9,26 @@ Professional network performance testing suite with real-time visualization, sup
 
 ## Features
 
+### Network Interface Management
+- **Auto-Detection & Selection**
+  - Automatic interface discovery using netifaces & psutil
+  - Real-time interface status monitoring (up/down)
+  - Dropdown selector with status indicators
+  - TSN capability detection (igb, igc, lan966x drivers)
+
+- **Detailed Interface Information**
+  - MAC address, IPv4/IPv6, netmask
+  - Link speed, MTU, duplex mode
+  - Driver, firmware, bus info (via ethtool)
+  - RX/TX statistics and error counters
+
+### Privilege Management
+- **Secure Sudo Session**
+  - Password verification and secure storage (memory only)
+  - 15-minute session timeout
+  - Safe execution of privileged commands
+  - Session status monitoring
+
 ### Traffic Generation & Testing
 - **iperf3 Integration**
   - TCP/UDP bandwidth testing with real-time charts
