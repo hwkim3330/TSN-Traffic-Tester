@@ -864,6 +864,91 @@ function exportTable() {
 }
 
 // ============================================================================
+// Network Interface Management
+// ============================================================================
+
+let currentInterfaceData = null;
+
+async function loadInterfaces() {
+    try {
+        const response = await fetch('/api/interfaces?refresh=true');
+        const data = await response.json();
+
+        const select = document.getElementById('interface-select');
+        select.innerHTML = '<option value="">Select an interface...</option>';
+
+        if (data.interfaces && data.interfaces.length > 0) {
+            data.interfaces.forEach(iface => {
+                const option = document.createElement('option');
+                option.value = iface.name;
+                const status = iface.status === 'up' ? '🟢' : '🔴';
+                const ipInfo = iface.ipv4 ? ` - ${iface.ipv4}` : '';
+                option.textContent = `${status} ${iface.name}${ipInfo}`;
+                select.appendChild(option);
+            });
+
+            log(`Loaded ${data.interfaces.length} network interfaces`, 'success');
+        } else {
+            log('No network interfaces found', 'warning');
+        }
+    } catch (error) {
+        log(`Failed to load interfaces: ${error.message}`, 'error');
+    }
+}
+
+async function refreshInterfaces() {
+    log('Refreshing network interfaces...', 'info');
+    await loadInterfaces();
+}
+
+async function onInterfaceChange() {
+    const select = document.getElementById('interface-select');
+    const ifaceName = select.value;
+
+    if (!ifaceName) {
+        document.getElementById('interface-status').textContent = 'Select an interface';
+        document.getElementById('interface-details').style.display = 'none';
+        return;
+    }
+
+    try {
+        // Get basic interface info
+        const response = await fetch(`/api/interfaces/${ifaceName}`);
+        const iface = await response.json();
+
+        // Update status
+        const statusDiv = document.getElementById('interface-status');
+        statusDiv.innerHTML = `<span style="color: ${iface.status === 'up' ? '#0066CC' : '#667eea'};">● ${iface.status.toUpperCase()}</span>`;
+
+        // Update basic details
+        document.getElementById('iface-mac').textContent = iface.mac || '-';
+        document.getElementById('iface-ipv4').textContent = iface.ipv4 || '-';
+        document.getElementById('iface-speed').textContent = iface.speed || '-';
+        document.getElementById('iface-mtu').textContent = iface.mtu || '-';
+
+        // Get ethtool info
+        const ethtoolResponse = await fetch(`/api/interfaces/${ifaceName}/ethtool`);
+        const ethtool = await ethtoolResponse.json();
+
+        document.getElementById('iface-driver').textContent = ethtool.driver || '-';
+        document.getElementById('iface-duplex').textContent = ethtool.duplex || '-';
+        document.getElementById('iface-tsn').textContent = ethtool.tsn_capable ? 'Yes ✓' : 'No';
+        document.getElementById('iface-link').textContent = ethtool.link_detected ? 'Up ✓' : 'Down';
+
+        // Show details
+        document.getElementById('interface-details').style.display = 'block';
+
+        // Store current interface data
+        currentInterfaceData = { ...iface, ...ethtool };
+
+        log(`Selected interface: ${ifaceName} (${iface.status})`, 'info');
+
+    } catch (error) {
+        log(`Failed to get interface details: ${error.message}`, 'error');
+    }
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 
@@ -873,6 +958,7 @@ window.onload = () => {
     initMultiSizeChart();
     connectWebSocket();
     updateTestConfig();
+    loadInterfaces();
 
     // Request server status
     setTimeout(() => {

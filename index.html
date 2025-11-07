@@ -527,6 +527,68 @@
             </div>
         </div>
 
+        <!-- Network Interface Panel -->
+        <div class="mode-selector">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 16px; font-weight: 600;">🔌 Network Interface</h3>
+                <button class="btn-secondary" onclick="refreshInterfaces()" style="padding: 6px 12px; font-size: 13px;">
+                    🔄 Refresh
+                </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label class="config-label">Interface Selection</label>
+                    <select id="interface-select" class="config-input" onchange="onInterfaceChange()">
+                        <option value="">Loading interfaces...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="config-label">Interface Status</label>
+                    <div id="interface-status" style="padding: 8px 12px; background: var(--bg-gray); border-radius: 4px; font-size: 13px;">
+                        Select an interface
+                    </div>
+                </div>
+            </div>
+            <div id="interface-details" style="display: none; margin-top: 15px; padding: 15px; background: var(--bg-gray); border-radius: 4px;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; font-size: 13px;">
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">MAC Address</div>
+                        <div id="iface-mac" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">IPv4 Address</div>
+                        <div id="iface-ipv4" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">Speed</div>
+                        <div id="iface-speed" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">MTU</div>
+                        <div id="iface-mtu" style="font-weight: 600;">-</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; font-size: 13px; margin-top: 10px;">
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">Driver</div>
+                        <div id="iface-driver" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">Duplex</div>
+                        <div id="iface-duplex" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">TSN Capable</div>
+                        <div id="iface-tsn" style="font-weight: 600;">-</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--text-gray); margin-bottom: 4px;">Link</div>
+                        <div id="iface-link" style="font-weight: 600;">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Graph Panel - Full Width at Top -->
         <div class="graph-panel" id="graph-panel">
             <div class="graph-header">
