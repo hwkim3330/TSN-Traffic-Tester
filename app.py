@@ -7,6 +7,7 @@ Using iperf3 and sockperf for real traffic testing
 import logging
 import sys
 from pathlib import Path
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -26,20 +27,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI
-app = FastAPI(title="KETI TSN Traffic WebUI")
+# Global event loop reference
+main_loop = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup/shutdown events"""
+    global main_loop
+    # Startup
+    main_loop = asyncio.get_running_loop()
+    logger.info("Event loop stored for callbacks")
+    yield
+    # Shutdown
+    logger.info("Shutting down TSN Traffic WebUI")
+
+# Initialize FastAPI with lifespan
+app = FastAPI(title="KETI TSN Traffic WebUI", lifespan=lifespan)
 
 # Mount static files from root assets
 assets_dir = Path(__file__).parent / "assets"
 if assets_dir.exists():
     app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
-
-@app.on_event("startup")
-async def startup_event():
-    """Store event loop on startup"""
-    global main_loop
-    main_loop = asyncio.get_running_loop()
-    logger.info("Event loop stored for callbacks")
 
 # Mount tools/webui for app.js and other resources
 webui_dir = Path(__file__).parent / "tools" / "webui"
