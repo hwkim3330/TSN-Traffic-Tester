@@ -13,31 +13,40 @@
         }
 
         :root {
-            --primary: #2563EB;
-            --primary-dark: #1E40AF;
-            --primary-light: #3B82F6;
-            --secondary: #64748B;
+            /* Apple-inspired colors */
+            --apple-blue: #007AFF;
+            --apple-blue-dark: #0051D5;
+            --apple-blue-light: #5AC8FA;
+            --apple-gray: #8E8E93;
+            --apple-gray-light: #F2F2F7;
             --bg-white: #FFFFFF;
-            --bg-gray: #F8FAFC;
-            --bg-light-blue: #EFF6FF;
-            --bg-dark: #0F172A;
-            --border: #E2E8F0;
-            --border-gray: #E5E7EB;
-            --text-dark: #1E293B;
-            --text-gray: #64748B;
-            --text-light: #94A3B8;
-            --success: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-            --keti-blue: #0066CC;
-            --keti-blue-dark: #0052A3;
-            --keti-blue-light: #3388DD;
+            --bg-gray: #FAFAFA;
+            --border: #D1D1D6;
+            --text-primary: #000000;
+            --text-secondary: #3C3C43;
+            --text-tertiary: #8E8E93;
+            --success: #34C759;
+            --danger: #FF3B30;
+            --warning: #FF9500;
+
+            /* Aliases for compatibility */
+            --primary: var(--apple-blue);
+            --primary-dark: var(--apple-blue-dark);
+            --keti-blue: var(--apple-blue);
+            --keti-blue-dark: var(--apple-blue-dark);
+            --keti-blue-light: var(--apple-blue-light);
+            --bg-light-blue: var(--apple-gray-light);
+            --border-gray: var(--border);
+            --text-dark: var(--text-primary);
+            --text-gray: var(--text-secondary);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-            background: var(--bg-gray);
-            color: var(--text-dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Header */
@@ -57,25 +66,21 @@
         }
 
         .logo {
-            width: 48px;
-            height: 48px;
+            width: 120px;
+            height: 40px;
             object-fit: contain;
         }
 
         .title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dark);
-            letter-spacing: -0.5px;
-        }
-
-        .title-highlight {
-            color: var(--primary);
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.6px;
         }
 
         .status-badge {
             padding: 6px 14px;
-            border-radius: 6px;
+            border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
         }
@@ -90,6 +95,50 @@
             color: #991B1B;
         }
 
+        /* Sudo Badge */
+        .sudo-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .sudo-badge.locked {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .sudo-badge.unlocked {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        /* Unlock Button */
+        .unlock-btn {
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            background: var(--apple-blue);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .unlock-btn:hover {
+            background: var(--apple-blue-dark);
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .unlock-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 122, 255, 0.2);
+        }
+
         /* Main Container */
         .container {
             max-width: 1800px;
@@ -100,10 +149,11 @@
         /* Mode Selector */
         .mode-selector {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
         }
 
         .mode-tabs {
@@ -116,31 +166,34 @@
             flex: 1;
             padding: 12px 24px;
             background: var(--bg-gray);
-            border: 2px solid var(--border-gray);
-            border-radius: 6px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
             text-align: center;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
         }
 
         .mode-tab.active {
-            background: var(--keti-blue);
+            background: var(--apple-blue);
             color: white;
-            border-color: var(--keti-blue);
+            border-color: var(--apple-blue);
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
         }
 
         .mode-tab:hover:not(.active) {
-            border-color: var(--keti-blue-light);
+            border-color: var(--apple-blue);
+            background: var(--apple-gray-light);
         }
 
         /* Compact Top Bar */
         .top-bar {
             background: var(--bg-white);
-            border-radius: 8px;
-            padding: 16px 20px;
+            border-radius: 16px;
+            padding: 20px 24px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             display: grid;
             grid-template-columns: 2fr 3fr;
             gap: 20px;
@@ -160,22 +213,25 @@
         .config-input {
             width: 100%;
             padding: 8px 12px;
-            border: 2px solid var(--border-gray);
-            border-radius: 4px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.2s ease;
+            background: var(--bg-white);
         }
 
         .config-input:focus {
             outline: none;
-            border-color: var(--keti-blue);
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
 
         /* Tab System */
         .tab-container {
             background: var(--bg-white);
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             margin-bottom: 20px;
         }
 
@@ -219,9 +275,10 @@
         /* Graph Panel - Full Width at Top */
         .graph-panel {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             margin-bottom: 20px;
         }
 
@@ -260,9 +317,10 @@
         /* Control Panel - Horizontal Layout */
         .control-panel {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             margin-bottom: 20px;
         }
 
@@ -279,10 +337,10 @@
         .panel-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-dark);
+            color: var(--text-primary);
             margin-bottom: 20px;
             padding-bottom: 12px;
-            border-bottom: 2px solid var(--keti-blue);
+            border-bottom: 2px solid var(--apple-blue);
         }
 
         .section-title {
@@ -313,68 +371,92 @@
         input, select {
             width: 100%;
             padding: 10px 12px;
-            border: 2px solid var(--border-gray);
-            border-radius: 6px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.2s ease;
+            background: var(--bg-white);
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--keti-blue);
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
 
         .btn {
             width: 100%;
             padding: 12px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             margin-bottom: 8px;
         }
 
         .btn-primary {
-            background: var(--keti-blue);
+            background: var(--apple-blue);
             color: white;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.25);
         }
 
         .btn-primary:hover {
-            background: var(--keti-blue-dark);
+            background: var(--apple-blue-dark);
+            box-shadow: 0 3px 8px rgba(0, 122, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-success {
             background: var(--success);
             color: white;
+            box-shadow: 0 2px 6px rgba(52, 199, 89, 0.25);
         }
 
         .btn-success:hover {
-            background: #0055b3;
+            background: #28A745;
+            box-shadow: 0 3px 8px rgba(52, 199, 89, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-success:active {
+            transform: translateY(0);
         }
 
         .btn-danger {
             background: var(--danger);
             color: white;
+            box-shadow: 0 2px 6px rgba(255, 59, 48, 0.25);
         }
 
         .btn-danger:hover {
-            background: #5568d3;
+            background: #D32F2F;
+            box-shadow: 0 3px 8px rgba(255, 59, 48, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
             background: var(--bg-gray);
-            color: var(--text-dark);
-            border: 2px solid var(--border-gray);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
         }
 
         .btn-secondary:hover {
-            background: var(--border-gray);
+            background: var(--apple-gray-light);
+            border-color: var(--apple-gray);
         }
 
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
@@ -394,20 +476,20 @@
         .stat-card {
             background: var(--bg-gray);
             padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid var(--keti-blue);
+            border-radius: 12px;
+            border-left: 4px solid var(--apple-blue);
         }
 
         .stat-label {
             font-size: 12px;
-            color: var(--text-gray);
+            color: var(--text-secondary);
             margin-bottom: 4px;
         }
 
         .stat-value {
             font-size: 20px;
             font-weight: 600;
-            color: var(--keti-blue);
+            color: var(--apple-blue);
         }
 
         /* Server Control */
@@ -417,7 +499,7 @@
             gap: 8px;
             padding: 10px;
             background: var(--bg-gray);
-            border-radius: 6px;
+            border-radius: 12px;
             margin-bottom: 8px;
         }
 
@@ -425,12 +507,12 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--text-gray);
+            background: var(--apple-gray);
         }
 
         .status-dot.running {
-            background: var(--keti-blue);
-            box-shadow: 0 0 8px var(--keti-blue);
+            background: var(--apple-blue);
+            box-shadow: 0 0 8px var(--apple-blue);
         }
 
         .server-name {
@@ -441,22 +523,23 @@
 
         .server-port {
             font-size: 12px;
-            color: var(--text-gray);
+            color: var(--text-secondary);
         }
 
         /* Log Console */
         .log-panel {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
         }
 
         .log-console {
             background: #1E1E1E;
             color: #D4D4D4;
             padding: 16px;
-            border-radius: 6px;
+            border-radius: 12px;
             height: 200px;
             overflow-y: auto;
             font-family: 'Consolas', 'Monaco', monospace;
@@ -476,9 +559,10 @@
         /* Progress Bar */
         .progress-panel {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             margin-top: 20px;
         }
 
@@ -487,32 +571,33 @@
             justify-content: space-between;
             margin-bottom: 12px;
             font-size: 14px;
-            color: var(--text-gray);
+            color: var(--text-secondary);
         }
 
         .progress-bar-container {
             background: var(--bg-gray);
-            border-radius: 8px;
+            border-radius: 12px;
             height: 24px;
             overflow: hidden;
             position: relative;
         }
 
         .progress-bar {
-            background: linear-gradient(90deg, var(--keti-blue) 0%, var(--keti-blue-light) 100%);
+            background: linear-gradient(90deg, var(--apple-blue) 0%, var(--apple-blue-light) 100%);
             height: 100%;
             width: 0%;
             transition: width 0.3s ease;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 102, 204, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 122, 255, 0.3);
         }
 
         /* Latency Table */
         .table-panel {
             background: var(--bg-white);
-            border-radius: 8px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
             margin-top: 20px;
         }
 
@@ -593,13 +678,13 @@
     <div class="header">
         <div class="logo-section">
             <img src="assets/keti-logo.png" alt="KETI Logo" class="logo">
-            <div class="title"><span class="title-highlight">TSN</span> Traffic Tester</div>
+            <div class="title">TSN Traffic Tester</div>
         </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div style="display: flex; gap: 12px; align-items: center;">
             <!-- Sudo Session Status -->
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span id="sudo-status" style="font-size: 12px; padding: 4px 10px; border-radius: 12px; background: #f8d7da; color: #721c24;">🔒 Sudo: Locked</span>
-                <button onclick="showSudoModal()" style="padding: 6px 12px; font-size: 13px; border: none; background: var(--keti-blue); color: white; border-radius: 4px; cursor: pointer;">Unlock</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="sudo-status" class="sudo-badge locked">🔒 Locked</span>
+                <button onclick="showSudoModal()" class="unlock-btn">Unlock</button>
             </div>
             <span id="status" class="status-badge disconnected">Disconnected</span>
         </div>

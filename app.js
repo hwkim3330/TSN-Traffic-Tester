@@ -146,6 +146,11 @@ function handleMessage(message) {
             isTestRunning = false;
             break;
 
+        case 'log':
+            // Display log messages from server (e.g., ping output)
+            log(data.message || msg, data.level || 'info');
+            break;
+
         case 'error':
             log('Error: ' + (msg || data.message), 'error');
             break;
