@@ -1,18 +1,43 @@
-# TSN Traffic Tester Web UI - Python Dependencies
+# TSN Traffic Tester - Python Dependencies
 # Compatible with Python 3.8+ on x86_64, ARM64, ARMv7 (Raspberry Pi)
+# GitHub: https://github.com/hwkim3330/TSN-Traffic-Tester
 
-# Web Framework
-fastapi>=0.104.0,<1.0.0
-uvicorn[standard]>=0.24.0,<1.0.0
-websockets>=12.0,<13.0
+# ============================================================================
+# Core Web Framework
+# ============================================================================
+fastapi>=0.104.0,<1.0.0          # Modern, fast web framework for APIs
+uvicorn[standard]>=0.24.0,<1.0.0 # ASGI server with WebSocket support
+websockets>=12.0,<13.0           # WebSocket protocol implementation
 
-# HTTP Client (optional, for testing)
-httpx>=0.25.0,<1.0.0
+# ============================================================================
+# System & Network Utilities
+# ============================================================================
+psutil>=5.9.0,<6.0.0             # System and process utilities
+netifaces>=0.11.0                # Network interface information
 
-# System utilities (optional)
-psutil>=5.9.0,<6.0.0
+# ============================================================================
+# Optional Dependencies (for development/testing)
+# ============================================================================
+# httpx>=0.25.0,<1.0.0           # HTTP client (for API testing)
 
-# Note: The following system packages are required:
-# - iperf3: Install with 'apt install iperf3' or 'yum install iperf3'
-# - sockperf: Install with 'apt install sockperf' (Debian/Ubuntu)
-#             or compile from source on other platforms
+# ============================================================================
+# System Packages (Install via package manager)
+# ============================================================================
+# These tools must be installed separately using your system's package manager
+#
+# Ubuntu/Debian:
+#   sudo apt install -y mausezahn iperf3 gstreamer1.0-tools \
+#                        gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
+#                        gstreamer1.0-x264 v4l-utils
+#   sudo apt install -y sockperf  # Optional, Ubuntu 22.04+
+#
+# RHEL/CentOS/Fedora:
+#   sudo yum install -y iperf3 gstreamer1 gstreamer1-plugins-good \
+#                       gstreamer1-plugins-bad gstreamer1-plugins-ugly
+#
+# Package descriptions:
+#   - mausezahn:   Packet generator with VLAN/PCP support
+#   - iperf3:      Network throughput testing tool
+#   - sockperf:    Network latency testing tool
+#   - GStreamer:   Multimedia framework for video streaming
+#   - v4l-utils:   Video4Linux utilities for webcam support
