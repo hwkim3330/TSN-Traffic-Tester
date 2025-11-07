@@ -136,6 +136,25 @@ function handleMessage(message) {
             document.getElementById('mausezahn-status').style.color = '#721c24';
             break;
 
+        case 'gstreamer_started':
+        case 'gstreamer_receiver_started':
+            log(msg, 'success');
+            break;
+
+        case 'gstreamer_stopped':
+            log(msg, 'info');
+            updateVideoStats({});  // Reset stats
+            break;
+
+        case 'gstreamer_complete':
+            log('Video stream completed', 'success');
+            updateVideoStats(data);
+            break;
+
+        case 'gstreamer_error':
+            log('GStreamer error: ' + (data.error || 'Unknown error'), 'error');
+            break;
+
         case 'progress':
             updateProgress(data);
             break;
@@ -1169,6 +1188,72 @@ function formatBytes(bytes) {
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
+
+// ============================================================================
+// Video Streaming (GStreamer)
+// ============================================================================
+
+function startVideoSender() {
+    const interface = document.getElementById('video-interface').value;
+    const destIp = document.getElementById('video-dest-ip').value;
+    const destPort = parseInt(document.getElementById('video-dest-port').value);
+    const resolution = document.getElementById('video-resolution').value;
+    const framerate = parseInt(document.getElementById('video-framerate').value);
+    const bitrate = parseInt(document.getElementById('video-bitrate').value);
+    const vlanId = parseInt(document.getElementById('video-vlan').value);
+    const pcp = parseInt(document.getElementById('video-pcp').value);
+    const sourceType = document.getElementById('video-source').value;
+
+    const useWebcam = sourceType === 'webcam';
+
+    sendMessage('start_gstreamer_sender', {
+        interface: interface,
+        dest_ip: destIp,
+        dest_port: destPort,
+        vlan_id: vlanId,
+        pcp: pcp,
+        resolution: resolution,
+        framerate: framerate,
+        bitrate: bitrate,
+        codec: 'h264',
+        use_webcam: useWebcam,
+        device: '/dev/video0'
+    });
+
+    log(`Starting video sender to ${destIp}:${destPort} (${resolution} @ ${framerate}fps, ${bitrate}kbps)`, 'info');
+}
+
+function startVideoReceiver() {
+    const port = parseInt(document.getElementById('video-recv-port').value);
+    const display = document.getElementById('video-display').value === 'true';
+
+    sendMessage('start_gstreamer_receiver', {
+        port: port,
+        display: display,
+        save_file: null
+    });
+
+    log(`Starting video receiver on port ${port} (display: ${display})`, 'info');
+}
+
+function stopVideoStream() {
+    sendMessage('stop_gstreamer', {});
+    log('Stopping video stream...', 'info');
+}
+
+function updateVideoStats(stats) {
+    if (!stats) return;
+
+    const duration = stats.duration || 0;
+    const bitrate = stats.bitrate || 0;
+    const fps = stats.fps || 0;
+    const resolution = stats.resolution || '--';
+
+    document.getElementById('video-stat-duration').textContent = duration.toFixed(1) + ' s';
+    document.getElementById('video-stat-bitrate').textContent = bitrate + ' kbps';
+    document.getElementById('video-stat-fps').textContent = fps + ' fps';
+    document.getElementById('video-stat-resolution').textContent = resolution;
 }
 
 // ============================================================================

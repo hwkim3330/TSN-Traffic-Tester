@@ -49,7 +49,9 @@ class GStreamerTool:
                      resolution: str = "640x480",
                      framerate: int = 30,
                      bitrate: int = 2000,
-                     codec: str = "h264") -> bool:
+                     codec: str = "h264",
+                     use_webcam: bool = True,
+                     device: str = "/dev/video0") -> bool:
         """
         Start video streaming
 
@@ -63,6 +65,8 @@ class GStreamerTool:
             framerate: Frames per second
             bitrate: Encoding bitrate in kbps
             codec: Video codec ("h264", "h265", "vp8", "vp9")
+            use_webcam: Use real webcam (True) or test pattern (False)
+            device: Webcam device path (e.g., /dev/video0)
         """
         if self.is_running:
             logger.warning("GStreamer already running")
@@ -75,20 +79,29 @@ class GStreamerTool:
             logger.error(f"Invalid resolution: {resolution}")
             return False
 
-        # Build GStreamer pipeline for webcam streaming
-        # Using videotestsrc for testing (can be replaced with v4l2src for real webcam)
-        pipeline = [
-            'gst-launch-1.0', '-v',
-            # Video source (test pattern)
-            'videotestsrc', 'is-live=true',
-            '!', f'video/x-raw,width={width},height={height},framerate={framerate}/1',
-            # Encoder
+        # Build GStreamer pipeline for video streaming
+        pipeline = ['gst-launch-1.0', '-v']
+
+        if use_webcam:
+            # Real webcam source
+            pipeline.extend([
+                'v4l2src', f'device={device}',
+                '!', f'video/x-raw,width={width},height={height},framerate={framerate}/1'
+            ])
+        else:
+            # Test pattern
+            pipeline.extend([
+                'videotestsrc', 'is-live=true',
+                '!', f'video/x-raw,width={width},height={height},framerate={framerate}/1'
+            ])
+
+        # Encoder and network sink
+        pipeline.extend([
             '!', 'videoconvert',
-            '!', f'x264enc', f'bitrate={bitrate}', 'tune=zerolatency', 'speed-preset=ultrafast',
+            '!', 'x264enc', f'bitrate={bitrate}', 'tune=zerolatency', 'speed-preset=ultrafast',
             '!', 'rtph264pay',
-            # Network sink
             '!', 'udpsink', f'host={dest_ip}', f'port={dest_port}'
-        ]
+        ])
 
         logger.info(f"Starting GStreamer: {' '.join(pipeline)}")
 
@@ -187,6 +200,94 @@ class GStreamerTool:
     def is_streaming(self) -> bool:
         """Check if streaming is active"""
         return self.is_running
+
+    def start_receiver(self,
+                       port: int = 5000,
+                       display: bool = True,
+                       save_file: str = None) -> bool:
+        """
+        Start video receiver
+
+        Args:
+            port: Port to receive on
+            display: Display video window
+            save_file: Optional file path to save video
+        """
+        if self.is_running:
+            logger.warning("GStreamer already running")
+            return False
+
+        # Build GStreamer receiver pipeline
+        pipeline = ['gst-launch-1.0', '-v']
+
+        # Receive UDP RTP stream
+        pipeline.extend([
+            'udpsrc', f'port={port}',
+            '!', 'application/x-rtp,encoding-name=H264,payload=96',
+            '!', 'rtph264depay',
+            '!', 'h264parse',
+            '!', 'avdec_h264'
+        ])
+
+        if save_file:
+            # Save to file
+            pipeline.extend([
+                '!', 'tee', 'name=t',
+                't.', '!', 'queue', '!', 'videoconvert', '!', 'x264enc', '!', 'mp4mux', '!', f'filesink location={save_file}'
+            ])
+            if display:
+                pipeline.extend([
+                    't.', '!', 'queue', '!', 'videoconvert', '!', 'autovideosink'
+                ])
+        else:
+            if display:
+                # Display only
+                pipeline.extend([
+                    '!', 'videoconvert',
+                    '!', 'autovideosink'
+                ])
+            else:
+                # Fakesink (just receive, no display)
+                pipeline.extend([
+                    '!', 'fakesink'
+                ])
+
+        logger.info(f"Starting GStreamer receiver: {' '.join(pipeline)}")
+
+        try:
+            self.process = subprocess.Popen(
+                pipeline,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            self.is_running = True
+            self.stats = {
+                'duration': 0,
+                'port': port,
+                'mode': 'receiver'
+            }
+
+            # Start monitoring thread
+            self.thread = threading.Thread(
+                target=self._monitor_stream,
+                daemon=True
+            )
+            self.thread.start()
+
+            self._notify('gstreamer_receiver_started', {
+                'port': port,
+                'display': display,
+                'save_file': save_file
+            })
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to start GStreamer receiver: {e}")
+            self._notify('gstreamer_error', {'error': str(e)})
+            return False
 
     @staticmethod
     def check_available() -> bool:

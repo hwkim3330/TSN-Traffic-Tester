@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent / "tools"))
 from iperf3_tool import IPerf3Tool
 from sockperf_tool import SockPerfTool
 from mausezahn_tool import MausezahnTool
+from gstreamer_tool import GStreamerTool
 from network_manager import NetworkManager
 from sudo_manager import sudo_manager
 
@@ -64,6 +65,7 @@ if webui_dir.exists():
 iperf_tool = IPerf3Tool()
 sockperf_tool = SockPerfTool()
 mausezahn_tool = MausezahnTool()
+gstreamer_tool = GStreamerTool()
 network_manager = NetworkManager()
 
 # Active WebSocket connections
@@ -98,6 +100,7 @@ def tool_callback(event: str, data: dict):
 # Set callbacks
 iperf_tool.set_callback(tool_callback)
 sockperf_tool.set_callback(tool_callback)
+gstreamer_tool.set_callback(tool_callback)
 mausezahn_tool.set_callback(tool_callback)
 
 # =============================================================================
@@ -597,6 +600,74 @@ async def handle_message(websocket: WebSocket, message: dict):
                 "message": "Mausezahn stopped"
             })
 
+        # GStreamer video streaming commands
+        elif msg_type == "start_gstreamer_sender":
+            interface = data.get("interface", "eth0")
+            dest_ip = data.get("dest_ip", "127.0.0.1")
+            dest_port = int(data.get("dest_port", 5000))
+            vlan_id = int(data.get("vlan_id", 100))
+            pcp = int(data.get("pcp", 5))
+            resolution = data.get("resolution", "640x480")
+            framerate = int(data.get("framerate", 30))
+            bitrate = int(data.get("bitrate", 2000))
+            codec = data.get("codec", "h264")
+            use_webcam = data.get("use_webcam", True)
+            device = data.get("device", "/dev/video0")
+
+            success = gstreamer_tool.start_stream(
+                interface=interface,
+                dest_ip=dest_ip,
+                dest_port=dest_port,
+                vlan_id=vlan_id,
+                pcp=pcp,
+                resolution=resolution,
+                framerate=framerate,
+                bitrate=bitrate,
+                codec=codec,
+                use_webcam=use_webcam,
+                device=device
+            )
+
+            if success:
+                await broadcast({
+                    "type": "gstreamer_started",
+                    "message": f"Video stream started to {dest_ip}:{dest_port}"
+                })
+            else:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Failed to start video stream"
+                })
+
+        elif msg_type == "start_gstreamer_receiver":
+            port = int(data.get("port", 5000))
+            display = data.get("display", True)
+            save_file = data.get("save_file", None)
+
+            success = gstreamer_tool.start_receiver(
+                port=port,
+                display=display,
+                save_file=save_file
+            )
+
+            if success:
+                await broadcast({
+                    "type": "gstreamer_receiver_started",
+                    "message": f"Video receiver started on port {port}"
+                })
+            else:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Failed to start video receiver"
+                })
+
+        elif msg_type == "stop_gstreamer":
+            gstreamer_tool.stop_stream()
+            await broadcast({
+                "type": "gstreamer_stopped",
+                "message": "GStreamer stopped"
+            })
+
         # Get stats
         elif msg_type == "get_stats":
             await websocket.send_json({
@@ -604,7 +675,8 @@ async def handle_message(websocket: WebSocket, message: dict):
                 "data": {
                     "iperf": iperf_tool.get_stats(),
                     "sockperf": sockperf_tool.get_stats(),
-                    "mausezahn": mausezahn_tool.get_stats()
+                    "mausezahn": mausezahn_tool.get_stats(),
+                    "gstreamer": gstreamer_tool.get_stats()
                 }
             })
 

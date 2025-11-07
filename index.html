@@ -797,6 +797,7 @@
             <div class="tab-buttons">
                 <button class="tab-btn active" onclick="switchTab('traffic-tests')">🔬 Traffic Tests</button>
                 <button class="tab-btn" onclick="switchTab('packet-gen')">📦 Packet Generator</button>
+                <button class="tab-btn" onclick="switchTab('video-stream')">📹 Video Stream</button>
                 <button class="tab-btn" onclick="switchTab('servers')">⚙️ Servers</button>
             </div>
 
@@ -986,6 +987,126 @@
                             </div>
                         </div>
                         <button class="btn btn-secondary" onclick="exportResults()" style="margin-top: 16px;">💾 Export Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Stream Tab -->
+            <div id="tab-video-stream" class="tab-content">
+                <div class="control-section">
+                    <div class="section-title">📹 Video Stream Sender</div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label class="input-label">Network Interface</label>
+                            <select id="video-interface" class="control-select">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="input-label">Destination IP</label>
+                            <input type="text" id="video-dest-ip" class="control-input" placeholder="127.0.0.1" value="127.0.0.1">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Destination Port</label>
+                            <input type="number" id="video-dest-port" class="control-input" placeholder="5000" value="5000">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Resolution</label>
+                            <select id="video-resolution" class="control-select">
+                                <option value="640x480">640x480 (VGA)</option>
+                                <option value="1280x720">1280x720 (HD)</option>
+                                <option value="1920x1080">1920x1080 (Full HD)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="input-label">Frame Rate (fps)</label>
+                            <input type="number" id="video-framerate" class="control-input" placeholder="30" value="30" min="1" max="60">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Bitrate (kbps)</label>
+                            <input type="number" id="video-bitrate" class="control-input" placeholder="2000" value="2000" min="500" max="10000">
+                        </div>
+
+                        <div>
+                            <label class="input-label">VLAN ID</label>
+                            <input type="number" id="video-vlan" class="control-input" placeholder="100" value="100" min="0" max="4095">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Priority (PCP)</label>
+                            <input type="number" id="video-pcp" class="control-input" placeholder="5" value="5" min="0" max="7">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Source</label>
+                            <select id="video-source" class="control-select">
+                                <option value="webcam">Webcam (/dev/video0)</option>
+                                <option value="test">Test Pattern</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button class="btn btn-primary" onclick="startVideoSender()">▶ Start Sender</button>
+                        <button class="btn btn-danger" onclick="stopVideoStream()">⏹ Stop Stream</button>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: var(--bg-gray); border-radius: 8px;">
+                        <div style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                            <strong>Note:</strong> Low-latency H.264 streaming using GStreamer. Requires <code>gst-launch-1.0</code>, <code>v4l2src</code>, and <code>x264enc</code> plugins.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-section" style="margin-top: 24px;">
+                    <div class="section-title">📺 Video Stream Receiver</div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <label class="input-label">Receive Port</label>
+                            <input type="number" id="video-recv-port" class="control-input" placeholder="5000" value="5000">
+                        </div>
+
+                        <div>
+                            <label class="input-label">Display</label>
+                            <select id="video-display" class="control-select">
+                                <option value="true">Show Video Window</option>
+                                <option value="false">Background Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; margin-top: 16px;">
+                        <button class="btn btn-success" onclick="startVideoReceiver()">▶ Start Receiver</button>
+                        <button class="btn btn-danger" onclick="stopVideoStream()">⏹ Stop Stream</button>
+                    </div>
+                </div>
+
+                <div class="control-section" style="margin-top: 24px;">
+                    <div class="section-title">📊 Stream Statistics</div>
+                    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 12px;">
+                        <div class="stat-card">
+                            <div class="stat-label">Duration</div>
+                            <div class="stat-value" id="video-stat-duration">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Bitrate</div>
+                            <div class="stat-value" id="video-stat-bitrate">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">FPS</div>
+                            <div class="stat-value" id="video-stat-fps">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Resolution</div>
+                            <div class="stat-value" id="video-stat-resolution">--</div>
+                        </div>
                     </div>
                 </div>
             </div>
