@@ -1,0 +1,18 @@
+# TSN Traffic Tester Web UI - Python Dependencies
+# Compatible with Python 3.8+ on x86_64, ARM64, ARMv7 (Raspberry Pi)
+
+# Web Framework
+fastapi>=0.104.0,<1.0.0
+uvicorn[standard]>=0.24.0,<1.0.0
+websockets>=12.0,<13.0
+
+# HTTP Client (optional, for testing)
+httpx>=0.25.0,<1.0.0
+
+# System utilities (optional)
+psutil>=5.9.0,<6.0.0
+
+# Note: The following system packages are required:
+# - iperf3: Install with 'apt install iperf3' or 'yum install iperf3'
+# - sockperf: Install with 'apt install sockperf' (Debian/Ubuntu)
+#             or compile from source on other platforms
