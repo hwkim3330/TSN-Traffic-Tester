@@ -54,14 +54,7 @@
         .logo {
             width: 36px;
             height: 36px;
-            background: var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            color: white;
-            font-size: 18px;
+            object-fit: contain;
         }
 
         .title {
@@ -594,7 +587,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo-section">
-            <div class="logo">T</div>
+            <img src="assets/keti-logo.png" alt="KETI Logo" class="logo">
             <div class="title"><span class="title-highlight">TSN</span> Traffic Tester</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
@@ -629,10 +622,10 @@
             <div>
                 <label class="config-label">Operation Mode</label>
                 <div style="display: flex; gap: 8px;">
-                    <button class="mode-tab active" onclick="switchMode('sender')" style="font-size: 13px; padding: 10px 16px;">
+                    <button class="mode-tab active" onclick="switchMode('sender')">
                         📤 Sender
                     </button>
-                    <button class="mode-tab" onclick="switchMode('receiver')" style="font-size: 13px; padding: 10px 16px; background: var(--bg-gray); color: var(--text-dark); border-color: var(--border-gray);">
+                    <button class="mode-tab" onclick="switchMode('receiver')">
                         📥 Receiver
                     </button>
                 </div>
@@ -712,13 +705,13 @@
         <!-- Testing Tools - Tabbed Interface -->
         <div class="tab-container">
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('packet-gen')">📦 Packet Generator</button>
-                <button class="tab-btn" onclick="switchTab('traffic-tests')">🔬 Traffic Tests</button>
+                <button class="tab-btn active" onclick="switchTab('traffic-tests')">🔬 Traffic Tests</button>
+                <button class="tab-btn" onclick="switchTab('packet-gen')">📦 Packet Generator</button>
                 <button class="tab-btn" onclick="switchTab('servers')">⚙️ Servers</button>
             </div>
 
             <!-- Packet Generator Tab -->
-            <div id="tab-packet-gen" class="tab-content active">
+            <div id="tab-packet-gen" class="tab-content">
                 <!-- Mausezahn Packet Generator -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Mausezahn Packet Generator</h3>
@@ -839,7 +832,7 @@
             </div>
 
             <!-- Traffic Tests Tab -->
-            <div id="tab-traffic-tests" class="tab-content">
+            <div id="tab-traffic-tests" class="tab-content active">
                 <div class="control-grid">
                     <!-- Network Configuration -->
                     <div class="control-section">
