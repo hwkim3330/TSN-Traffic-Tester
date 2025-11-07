@@ -13,20 +13,20 @@
         }
 
         :root {
-            --keti-blue: #1E88E5;
-            --keti-blue-light: #42A5F5;
-            --keti-blue-dark: #1565C0;
-            --keti-accent: #0D47A1;
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #3B82F6;
+            --secondary: #64748B;
             --bg-white: #FFFFFF;
-            --bg-gray: #F5F7FA;
-            --bg-light-blue: #E3F2FD;
-            --border-gray: #E0E0E0;
-            --text-dark: #212529;
-            --text-gray: #757575;
-            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FF9800;
-            --info: #2196F3;
+            --bg-gray: #F8FAFC;
+            --bg-dark: #0F172A;
+            --border: #E2E8F0;
+            --text-dark: #1E293B;
+            --text-gray: #64748B;
+            --text-light: #94A3B8;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
         }
 
         body {
@@ -37,9 +37,9 @@
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--keti-blue) 0%, var(--keti-blue-dark) 100%);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 16px 30px;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -48,55 +48,48 @@
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .logo {
-            height: 42px;
-            padding: 6px 12px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .logo img {
-            height: 100%;
-            width: auto;
+            font-weight: 800;
+            color: white;
+            font-size: 18px;
         }
 
         .title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            letter-spacing: 0.5px;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
         }
 
         .title-highlight {
-            color: #FFD740;
-            font-weight: 800;
+            color: var(--primary);
         }
 
         .status-badge {
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 6px 14px;
+            border-radius: 6px;
             font-size: 13px;
             font-weight: 600;
-            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .status-badge.connected {
-            background: rgba(76, 175, 80, 0.2);
-            color: #C8E6C9;
-            border-color: #81C784;
+            background: #D1FAE5;
+            color: #065F46;
         }
 
         .status-badge.disconnected {
-            background: rgba(244, 67, 54, 0.2);
-            color: #FFCDD2;
-            border-color: #E57373;
+            background: #FEE2E2;
+            color: #991B1B;
         }
 
         /* Main Container */
@@ -196,25 +189,24 @@
 
         .tab-btn {
             flex: 1;
-            padding: 14px 20px;
+            padding: 12px 20px;
             background: none;
             border: none;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
             color: var(--text-gray);
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
         .tab-btn.active {
-            color: var(--keti-blue);
-            border-bottom-color: var(--keti-blue);
-            background: rgba(0, 102, 204, 0.05);
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
         .tab-btn:hover:not(.active) {
-            background: var(--bg-gray);
+            color: var(--text-dark);
         }
 
         .tab-content {
@@ -602,9 +594,7 @@
     <!-- Header -->
     <div class="header">
         <div class="logo-section">
-            <div class="logo">
-                <img src="assets/keti-logo.png" alt="KETI Logo">
-            </div>
+            <div class="logo">T</div>
             <div class="title"><span class="title-highlight">TSN</span> Traffic Tester</div>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
