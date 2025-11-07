@@ -107,6 +107,35 @@ function handleMessage(message) {
             updateServerStatus();
             break;
 
+        case 'mausezahn_started':
+            log(msg, 'success');
+            break;
+
+        case 'mausezahn_stopped':
+            log(msg, 'info');
+            break;
+
+        case 'mausezahn_complete':
+            log('Mausezahn packet generation completed', 'success');
+            updateMausezahnStats(data);
+            // Reset UI
+            document.getElementById('mausezahn-start-btn').style.display = 'inline-block';
+            document.getElementById('mausezahn-stop-btn').style.display = 'none';
+            document.getElementById('mausezahn-status').textContent = '● Completed';
+            document.getElementById('mausezahn-status').style.background = '#d4edda';
+            document.getElementById('mausezahn-status').style.color = '#155724';
+            break;
+
+        case 'mausezahn_error':
+            log('Mausezahn error: ' + (data.error || 'Unknown error'), 'error');
+            // Reset UI
+            document.getElementById('mausezahn-start-btn').style.display = 'inline-block';
+            document.getElementById('mausezahn-stop-btn').style.display = 'none';
+            document.getElementById('mausezahn-status').textContent = '● Error';
+            document.getElementById('mausezahn-status').style.background = '#f8d7da';
+            document.getElementById('mausezahn-status').style.color = '#721c24';
+            break;
+
         case 'progress':
             updateProgress(data);
             break;
@@ -174,20 +203,29 @@ function switchMode(mode) {
             tab.classList.remove('active');
         }
     });
+}
 
-    // Update description
-    const desc = document.getElementById('mode-description');
-    const generatorConfig = document.getElementById('generator-config');
+// ============================================================================
+// Tab Switching
+// ============================================================================
 
-    if (mode === 'generator') {
-        desc.textContent = 'Generate traffic and send to remote listener';
-        generatorConfig.style.display = 'block';
-    } else {
-        desc.textContent = 'Listen for incoming traffic and measure performance';
-        generatorConfig.style.display = 'none';
+function switchTab(tabName) {
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+
+    // Remove active class from all tab contents
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    // Add active class to selected tab button
+    event.currentTarget.classList.add('active');
+
+    // Add active class to selected tab content
+    const activeContent = document.getElementById(`tab-${tabName}`);
+    if (activeContent) {
+        activeContent.classList.add('active');
     }
-
-    log(`Switched to ${mode} mode`, 'info');
 }
 
 // ============================================================================
@@ -947,6 +985,186 @@ async function onInterfaceChange() {
         log(`Failed to get interface details: ${error.message}`, 'error');
     }
 }
+// ============================================================================
+// Sudo Session Management
+// ============================================================================
+
+function showSudoModal() {
+    document.getElementById('sudo-modal').style.display = 'flex';
+    document.getElementById('sudo-password-input').value = '';
+    document.getElementById('sudo-error').style.display = 'none';
+    document.getElementById('sudo-password-input').focus();
+}
+
+function hideSudoModal() {
+    document.getElementById('sudo-modal').style.display = 'none';
+}
+
+async function authenticateSudo() {
+    const password = document.getElementById('sudo-password-input').value;
+
+    if (!password) {
+        showSudoError('Please enter a password');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/sudo/auth', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({password})
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            log('Sudo session unlocked', 'success');
+            hideSudoModal();
+            updateSudoStatus(data.session);
+        } else {
+            showSudoError(data.message || 'Authentication failed');
+        }
+    } catch (error) {
+        showSudoError('Failed to authenticate: ' + error.message);
+    }
+}
+
+function showSudoError(message) {
+    const errorDiv = document.getElementById('sudo-error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+async function checkSudoStatus() {
+    try {
+        const response = await fetch('/api/sudo/session');
+        const data = await response.json();
+
+        if (data.session) {
+            updateSudoStatus(data.session);
+        }
+    } catch (error) {
+        console.error('Failed to check sudo status:', error);
+    }
+}
+
+function updateSudoStatus(session) {
+    const statusSpan = document.getElementById('sudo-status');
+
+    if (session && session.active) {
+        const minutes = Math.floor(session.remaining_time / 60);
+        const seconds = session.remaining_time % 60;
+        statusSpan.textContent = `🔓 Sudo: Active (${minutes}:${seconds.toString().padStart(2, '0')})`;
+        statusSpan.style.background = '#d4edda';
+        statusSpan.style.color = '#155724';
+    } else {
+        statusSpan.textContent = '🔒 Sudo: Locked';
+        statusSpan.style.background = '#f8d7da';
+        statusSpan.style.color = '#721c24';
+    }
+}
+
+// Enter key support for sudo password
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('sudo-password-input');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                authenticateSudo();
+            }
+        });
+    }
+});
+
+// ============================================================================
+// Mausezahn Packet Generator Functions
+// ============================================================================
+
+function startMausezahn() {
+    const interfaceSelect = document.getElementById('interface-select');
+    const selectedInterface = interfaceSelect.value;
+
+    if (!selectedInterface) {
+        log('Please select a network interface first', 'error');
+        return;
+    }
+
+    const destIp = document.getElementById('mz-dest-ip').value;
+    const packetType = document.getElementById('mz-packet-type').value;
+    const destPort = parseInt(document.getElementById('mz-dest-port').value);
+    const vlanId = parseInt(document.getElementById('mz-vlan-id').value);
+    const pcp = parseInt(document.getElementById('mz-pcp').value);
+    const packetSize = parseInt(document.getElementById('mz-packet-size').value);
+    const count = parseInt(document.getElementById('mz-count').value);
+    const delay = document.getElementById('mz-delay').value;
+    const srcMac = document.getElementById('mz-src-mac').value || null;
+    const destMac = document.getElementById('mz-dest-mac').value || null;
+
+    if (!destIp) {
+        log('Please enter a destination IP address', 'error');
+        return;
+    }
+
+    const data = {
+        interface: selectedInterface,
+        dest_ip: destIp,
+        vlan_id: vlanId,
+        pcp: pcp,
+        packet_type: packetType,
+        dest_port: destPort,
+        packet_size: packetSize,
+        count: count,
+        delay: delay
+    };
+
+    if (srcMac) data.src_mac = srcMac;
+    if (destMac) data.dest_mac = destMac;
+
+    log(`Starting mausezahn on ${selectedInterface} - VLAN ${vlanId}, PCP ${pcp}`, 'info');
+
+    sendMessage('start_mausezahn_vlan', data);
+
+    // Update UI
+    document.getElementById('mausezahn-start-btn').style.display = 'none';
+    document.getElementById('mausezahn-stop-btn').style.display = 'inline-block';
+    document.getElementById('mausezahn-status').textContent = '● Running';
+    document.getElementById('mausezahn-status').style.background = '#d4edda';
+    document.getElementById('mausezahn-status').style.color = '#155724';
+    document.getElementById('mausezahn-stats').style.display = 'block';
+}
+
+function stopMausezahn() {
+    sendMessage('stop_mausezahn', {});
+    log('Stopping mausezahn...', 'info');
+
+    // Update UI
+    document.getElementById('mausezahn-start-btn').style.display = 'inline-block';
+    document.getElementById('mausezahn-stop-btn').style.display = 'none';
+    document.getElementById('mausezahn-status').textContent = '● Idle';
+    document.getElementById('mausezahn-status').style.background = '#e9ecef';
+    document.getElementById('mausezahn-status').style.color = '#6c757d';
+}
+
+function updateMausezahnStats(stats) {
+    if (!stats) return;
+
+    document.getElementById('mz-stat-packets').textContent = stats.packets_sent || 0;
+    document.getElementById('mz-stat-bytes').textContent = formatBytes(stats.bytes_sent || 0);
+    document.getElementById('mz-stat-duration').textContent = (stats.duration || 0).toFixed(2) + ' s';
+
+    if (stats.duration && stats.duration > 0) {
+        const rate = Math.round(stats.packets_sent / stats.duration);
+        document.getElementById('mz-stat-rate').textContent = rate + ' pps';
+    }
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+}
 
 // ============================================================================
 // Initialization
@@ -963,5 +1181,11 @@ window.onload = () => {
     // Request server status
     setTimeout(() => {
         updateServerStatus();
+        checkSudoStatus();
     }, 1000);
+
+    // Periodic sudo status check (every 10 seconds)
+    setInterval(() => {
+        checkSudoStatus();
+    }, 10000);
 };

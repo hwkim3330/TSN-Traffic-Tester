@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent / "tools"))
 
 from iperf3_tool import IPerf3Tool
 from sockperf_tool import SockPerfTool
+from mausezahn_tool import MausezahnTool
 from network_manager import NetworkManager
 from sudo_manager import sudo_manager
 
@@ -62,6 +63,7 @@ if webui_dir.exists():
 # Global tool instances
 iperf_tool = IPerf3Tool()
 sockperf_tool = SockPerfTool()
+mausezahn_tool = MausezahnTool()
 network_manager = NetworkManager()
 
 # Active WebSocket connections
@@ -96,6 +98,7 @@ def tool_callback(event: str, data: dict):
 # Set callbacks
 iperf_tool.set_callback(tool_callback)
 sockperf_tool.set_callback(tool_callback)
+mausezahn_tool.set_callback(tool_callback)
 
 # =============================================================================
 # Routes
@@ -251,6 +254,129 @@ async def clear_sudo_session():
     return {"success": True, "message": "Session cleared"}
 
 # =============================================================================
+# Mausezahn Packet Generator API
+# =============================================================================
+
+@app.post("/api/mausezahn/start_vlan")
+async def start_mausezahn_vlan(data: dict):
+    """
+    Start VLAN-tagged packet generation
+
+    Request body:
+        {
+            "interface": "eth0",
+            "dest_ip": "192.168.1.2",
+            "vlan_id": 100,
+            "pcp": 5,
+            "packet_type": "udp",
+            "dest_port": 5000,
+            "packet_size": 1000,
+            "count": 1000,
+            "delay": "1msec",
+            "src_mac": "optional",
+            "dest_mac": "optional"
+        }
+    """
+    interface = data.get("interface")
+    dest_ip = data.get("dest_ip")
+    vlan_id = int(data.get("vlan_id", 100))
+    pcp = int(data.get("pcp", 0))
+    packet_type = data.get("packet_type", "udp")
+    dest_port = int(data.get("dest_port", 5000))
+    packet_size = int(data.get("packet_size", 1000))
+    count = int(data.get("count", 1000))
+    delay = data.get("delay", "1msec")
+    src_mac = data.get("src_mac", None)
+    dest_mac = data.get("dest_mac", None)
+
+    if not interface or not dest_ip:
+        return {"success": False, "message": "Interface and dest_ip are required"}
+
+    success = mausezahn_tool.start_vlan_traffic(
+        interface=interface,
+        dest_ip=dest_ip,
+        vlan_id=vlan_id,
+        pcp=pcp,
+        packet_type=packet_type,
+        dest_port=dest_port,
+        packet_size=packet_size,
+        count=count,
+        delay=delay,
+        src_mac=src_mac,
+        dest_mac=dest_mac
+    )
+
+    if success:
+        return {
+            "success": True,
+            "message": f"Started VLAN-tagged traffic on {interface} (VLAN {vlan_id}, PCP {pcp})"
+        }
+    else:
+        return {"success": False, "message": "Failed to start mausezahn"}
+
+@app.post("/api/mausezahn/start_custom")
+async def start_mausezahn_custom(data: dict):
+    """
+    Start custom packet generation with hex data
+
+    Request body:
+        {
+            "interface": "eth0",
+            "packet_hex": "aabbccddeeff",
+            "vlan_id": 100,
+            "pcp": 5,
+            "count": 1000,
+            "delay": "1msec"
+        }
+    """
+    interface = data.get("interface")
+    packet_hex = data.get("packet_hex")
+    vlan_id = data.get("vlan_id", None)
+    pcp = int(data.get("pcp", 0))
+    count = int(data.get("count", 1000))
+    delay = data.get("delay", "1msec")
+
+    if not interface or not packet_hex:
+        return {"success": False, "message": "Interface and packet_hex are required"}
+
+    success = mausezahn_tool.start_custom_traffic(
+        interface=interface,
+        packet_hex=packet_hex,
+        vlan_id=int(vlan_id) if vlan_id else None,
+        pcp=pcp,
+        count=count,
+        delay=delay
+    )
+
+    if success:
+        return {
+            "success": True,
+            "message": f"Started custom traffic on {interface}"
+        }
+    else:
+        return {"success": False, "message": "Failed to start mausezahn"}
+
+@app.post("/api/mausezahn/stop")
+async def stop_mausezahn():
+    """Stop mausezahn packet generation"""
+    mausezahn_tool.stop()
+    return {"success": True, "message": "Mausezahn stopped"}
+
+@app.get("/api/mausezahn/stats")
+async def get_mausezahn_stats():
+    """Get mausezahn statistics"""
+    stats = mausezahn_tool.get_stats()
+    return {"stats": stats}
+
+@app.get("/api/mausezahn/status")
+async def get_mausezahn_status():
+    """Get mausezahn running status"""
+    return {
+        "running": mausezahn_tool.running,
+        "available": MausezahnTool.check_available()
+    }
+
+# =============================================================================
 # WebSocket Endpoint
 # =============================================================================
 
@@ -401,13 +527,84 @@ async def handle_message(websocket: WebSocket, message: dict):
                     "message": "Failed to start multi-size test"
                 })
 
+        # mausezahn commands
+        elif msg_type == "start_mausezahn_vlan":
+            interface = data.get("interface")
+            dest_ip = data.get("dest_ip")
+            vlan_id = int(data.get("vlan_id", 100))
+            pcp = int(data.get("pcp", 0))
+            packet_type = data.get("packet_type", "udp")
+            dest_port = int(data.get("dest_port", 5000))
+            packet_size = int(data.get("packet_size", 1000))
+            count = int(data.get("count", 1000))
+            delay = data.get("delay", "1msec")
+
+            success = mausezahn_tool.start_vlan_traffic(
+                interface=interface,
+                dest_ip=dest_ip,
+                vlan_id=vlan_id,
+                pcp=pcp,
+                packet_type=packet_type,
+                dest_port=dest_port,
+                packet_size=packet_size,
+                count=count,
+                delay=delay
+            )
+
+            if success:
+                await broadcast({
+                    "type": "mausezahn_started",
+                    "message": f"Mausezahn started on {interface} (VLAN {vlan_id}, PCP {pcp})"
+                })
+            else:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Failed to start mausezahn"
+                })
+
+        elif msg_type == "start_mausezahn_custom":
+            interface = data.get("interface")
+            packet_hex = data.get("packet_hex")
+            vlan_id = data.get("vlan_id", None)
+            pcp = int(data.get("pcp", 0))
+            count = int(data.get("count", 1000))
+            delay = data.get("delay", "1msec")
+
+            success = mausezahn_tool.start_custom_traffic(
+                interface=interface,
+                packet_hex=packet_hex,
+                vlan_id=int(vlan_id) if vlan_id else None,
+                pcp=pcp,
+                count=count,
+                delay=delay
+            )
+
+            if success:
+                await broadcast({
+                    "type": "mausezahn_started",
+                    "message": f"Mausezahn custom traffic started on {interface}"
+                })
+            else:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Failed to start mausezahn"
+                })
+
+        elif msg_type == "stop_mausezahn":
+            mausezahn_tool.stop()
+            await broadcast({
+                "type": "mausezahn_stopped",
+                "message": "Mausezahn stopped"
+            })
+
         # Get stats
         elif msg_type == "get_stats":
             await websocket.send_json({
                 "type": "stats",
                 "data": {
                     "iperf": iperf_tool.get_stats(),
-                    "sockperf": sockperf_tool.get_stats()
+                    "sockperf": sockperf_tool.get_stats(),
+                    "mausezahn": mausezahn_tool.get_stats()
                 }
             })
 

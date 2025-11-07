@@ -13,17 +13,20 @@
         }
 
         :root {
-            --keti-blue: #0066CC;
-            --keti-blue-light: #3385D6;
-            --keti-blue-dark: #004C99;
+            --keti-blue: #1E88E5;
+            --keti-blue-light: #42A5F5;
+            --keti-blue-dark: #1565C0;
+            --keti-accent: #0D47A1;
             --bg-white: #FFFFFF;
-            --bg-gray: #F8F9FA;
-            --border-gray: #E9ECEF;
+            --bg-gray: #F5F7FA;
+            --bg-light-blue: #E3F2FD;
+            --border-gray: #E0E0E0;
             --text-dark: #212529;
-            --text-gray: #6C757D;
-            --success: #0066CC;
-            --danger: #667eea;
-            --warning: #3385D6;
+            --text-gray: #757575;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --warning: #FF9800;
+            --info: #2196F3;
         }
 
         body {
@@ -34,9 +37,9 @@
 
         /* Header */
         .header {
-            background: var(--bg-white);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--keti-blue) 0%, var(--keti-blue-dark) 100%);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 16px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -49,7 +52,13 @@
         }
 
         .logo {
-            height: 40px;
+            height: 42px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .logo img {
@@ -58,9 +67,16 @@
         }
 
         .title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-dark);
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .title-highlight {
+            color: #FFD740;
+            font-weight: 800;
         }
 
         .status-badge {
@@ -68,16 +84,19 @@
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
+            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .status-badge.connected {
-            background: #D4EDDA;
-            color: var(--success);
+            background: rgba(76, 175, 80, 0.2);
+            color: #C8E6C9;
+            border-color: #81C784;
         }
 
         .status-badge.disconnected {
-            background: #F8D7DA;
-            color: var(--danger);
+            background: rgba(244, 67, 54, 0.2);
+            color: #FFCDD2;
+            border-color: #E57373;
         }
 
         /* Main Container */
@@ -122,6 +141,89 @@
 
         .mode-tab:hover:not(.active) {
             border-color: var(--keti-blue-light);
+        }
+
+        /* Compact Top Bar */
+        .top-bar {
+            background: var(--bg-white);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: 2fr 3fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .config-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--border-gray);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .config-input:focus {
+            outline: none;
+            border-color: var(--keti-blue);
+        }
+
+        /* Tab System */
+        .tab-container {
+            background: var(--bg-white);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border-gray);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-gray);
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--keti-blue);
+            border-bottom-color: var(--keti-blue);
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--bg-gray);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         /* Graph Panel - Full Width at Top */
@@ -503,87 +605,102 @@
             <div class="logo">
                 <img src="assets/keti-logo.png" alt="KETI Logo">
             </div>
-            <div class="title">TSN Traffic Tester</div>
+            <div class="title"><span class="title-highlight">TSN</span> Traffic Tester</div>
         </div>
-        <div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <!-- Sudo Session Status -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="sudo-status" style="font-size: 12px; padding: 4px 10px; border-radius: 12px; background: #f8d7da; color: #721c24;">🔒 Sudo: Locked</span>
+                <button onclick="showSudoModal()" style="padding: 6px 12px; font-size: 13px; border: none; background: var(--keti-blue); color: white; border-radius: 4px; cursor: pointer;">Unlock</button>
+            </div>
             <span id="status" class="status-badge disconnected">Disconnected</span>
+        </div>
+    </div>
+
+    <!-- Sudo Password Modal -->
+    <div id="sudo-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 400px; width: 90%;">
+            <h3 style="margin: 0 0 15px 0; font-size: 18px;">🔓 Unlock Sudo Session</h3>
+            <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 20px;">Enter your sudo password to enable privileged operations (interface control, packet generation).</p>
+            <input type="password" id="sudo-password-input" placeholder="Enter sudo password" style="width: 100%; padding: 10px; border: 1px solid var(--border-gray); border-radius: 4px; font-size: 14px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="hideSudoModal()" style="padding: 8px 16px; border: 1px solid var(--border-gray); background: white; border-radius: 4px; cursor: pointer;">Cancel</button>
+                <button onclick="authenticateSudo()" style="padding: 8px 16px; border: none; background: var(--keti-blue); color: white; border-radius: 4px; cursor: pointer;">Unlock</button>
+            </div>
+            <div id="sudo-error" style="display: none; margin-top: 15px; padding: 10px; background: #f8d7da; color: #721c24; border-radius: 4px; font-size: 13px;"></div>
         </div>
     </div>
 
     <!-- Main Container -->
     <div class="container">
-        <!-- Mode Selector -->
-        <div class="mode-selector">
-            <div class="mode-tabs">
-                <div class="mode-tab active" onclick="switchMode('generator')">
-                    📤 Generator Mode
+        <!-- Top Bar: Mode + Interface Selection -->
+        <div class="top-bar">
+            <!-- Mode Selection -->
+            <div>
+                <label class="config-label">Operation Mode</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="mode-tab active" onclick="switchMode('sender')" style="font-size: 13px; padding: 10px 16px;">
+                        📤 Sender
+                    </button>
+                    <button class="mode-tab" onclick="switchMode('receiver')" style="font-size: 13px; padding: 10px 16px; background: var(--bg-gray); color: var(--text-dark); border-color: var(--border-gray);">
+                        📥 Receiver
+                    </button>
                 </div>
-                <div class="mode-tab" onclick="switchMode('listener')">
-                    📥 Listener Mode
+                <div id="mode-description" style="color: var(--text-gray); font-size: 12px; margin-top: 6px;">
+                    Send traffic to remote receiver
                 </div>
             </div>
-            <div id="mode-description" style="color: var(--text-gray); font-size: 14px;">
-                Generate traffic and send to remote listener
-            </div>
-        </div>
 
-        <!-- Network Interface Panel -->
-        <div class="mode-selector">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0; font-size: 16px; font-weight: 600;">🔌 Network Interface</h3>
-                <button class="btn-secondary" onclick="refreshInterfaces()" style="padding: 6px 12px; font-size: 13px;">
-                    🔄 Refresh
-                </button>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div>
-                    <label class="config-label">Interface Selection</label>
-                    <select id="interface-select" class="config-input" onchange="onInterfaceChange()">
-                        <option value="">Loading interfaces...</option>
-                    </select>
+            <!-- Network Interface Selection -->
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label class="config-label">Network Interface</label>
+                    <button onclick="refreshInterfaces()" style="padding: 4px 8px; font-size: 11px; border: 1px solid var(--border-gray); background: white; border-radius: 3px; cursor: pointer; color: var(--text-gray);">
+                        🔄 Refresh
+                    </button>
                 </div>
-                <div>
-                    <label class="config-label">Interface Status</label>
-                    <div id="interface-status" style="padding: 8px 12px; background: var(--bg-gray); border-radius: 4px; font-size: 13px;">
-                        Select an interface
-                    </div>
+                <select id="interface-select" class="config-input" onchange="onInterfaceChange()">
+                    <option value="">Loading interfaces...</option>
+                </select>
+                <div id="interface-status" style="margin-top: 6px; padding: 6px 10px; background: var(--bg-gray); border-radius: 4px; font-size: 12px;">
+                    Select an interface
                 </div>
-            </div>
-            <div id="interface-details" style="display: none; margin-top: 15px; padding: 15px; background: var(--bg-gray); border-radius: 4px;">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; font-size: 13px;">
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">MAC Address</div>
-                        <div id="iface-mac" style="font-weight: 600;">-</div>
+                <div id="interface-details" style="display: none; margin-top: 10px; padding: 15px; background: var(--bg-light-blue); border-radius: 6px; font-size: 12px; border: 1px solid var(--keti-blue-light);">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 10px;">
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">MAC Address</div>
+                            <strong id="iface-mac" style="color: var(--keti-blue-dark); font-family: monospace;">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">IPv4 Address</div>
+                            <strong id="iface-ipv4" style="color: var(--keti-blue-dark); font-family: monospace;">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">Link Speed</div>
+                            <strong id="iface-speed" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">TSN Capable</div>
+                            <strong id="iface-tsn" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
                     </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">IPv4 Address</div>
-                        <div id="iface-ipv4" style="font-weight: 600;">-</div>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">Speed</div>
-                        <div id="iface-speed" style="font-weight: 600;">-</div>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">MTU</div>
-                        <div id="iface-mtu" style="font-weight: 600;">-</div>
-                    </div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; font-size: 13px; margin-top: 10px;">
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">Driver</div>
-                        <div id="iface-driver" style="font-weight: 600;">-</div>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">Duplex</div>
-                        <div id="iface-duplex" style="font-weight: 600;">-</div>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">TSN Capable</div>
-                        <div id="iface-tsn" style="font-weight: 600;">-</div>
-                    </div>
-                    <div>
-                        <div style="color: var(--text-gray); margin-bottom: 4px;">Link</div>
-                        <div id="iface-link" style="font-weight: 600;">-</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">MTU</div>
+                            <strong id="iface-mtu" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">Driver</div>
+                            <strong id="iface-driver" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">Duplex</div>
+                            <strong id="iface-duplex" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 3px;">Link Status</div>
+                            <strong id="iface-link" style="color: var(--keti-blue-dark);">-</strong>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -592,7 +709,7 @@
         <!-- Graph Panel - Full Width at Top -->
         <div class="graph-panel" id="graph-panel">
             <div class="graph-header">
-                <h2 class="panel-title" style="margin: 0; border: none; padding: 0;">Live Performance</h2>
+                <h2 class="panel-title" style="margin: 0; border: none; padding: 0;">📊 Live Performance</h2>
                 <button class="expand-btn" onclick="toggleExpand()">
                     <span id="expand-text">⛶ Expand</span>
                 </button>
@@ -602,11 +719,206 @@
             </div>
         </div>
 
-        <!-- Control Panel - Horizontal Layout -->
-        <div class="control-panel">
-            <h2 class="panel-title">Control Panel</h2>
-            <div class="control-grid">
-                <!-- Server Control -->
+        <!-- Testing Tools - Tabbed Interface -->
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('packet-gen')">📦 Packet Generator</button>
+                <button class="tab-btn" onclick="switchTab('traffic-tests')">🔬 Traffic Tests</button>
+                <button class="tab-btn" onclick="switchTab('servers')">⚙️ Servers</button>
+            </div>
+
+            <!-- Packet Generator Tab -->
+            <div id="tab-packet-gen" class="tab-content active">
+                <!-- Mausezahn Packet Generator -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 600;">Mausezahn Packet Generator</h3>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <span id="mausezahn-status" style="font-size: 12px; padding: 4px 10px; border-radius: 12px; background: #e9ecef; color: #6c757d;">● Idle</span>
+                        <button class="btn-success btn-compact" onclick="startMausezahn()" id="mausezahn-start-btn">
+                            ▶ Start
+                        </button>
+                        <button class="btn-danger btn-compact" onclick="stopMausezahn()" id="mausezahn-stop-btn" style="display: none;">
+                            ⏹ Stop
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Basic Configuration -->
+                <div style="margin-bottom: 20px;">
+                    <div class="section-title">Basic Configuration</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div>
+                            <label>Destination IP</label>
+                            <input type="text" id="mz-dest-ip" placeholder="192.168.1.2" value="127.0.0.1">
+                        </div>
+                        <div>
+                            <label>Packet Type</label>
+                            <select id="mz-packet-type">
+                                <option value="udp">UDP</option>
+                                <option value="tcp">TCP</option>
+                                <option value="icmp">ICMP</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Destination Port</label>
+                            <input type="number" id="mz-dest-port" value="5000" min="1" max="65535">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TSN Configuration -->
+                <div style="margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, rgba(0,102,204,0.05) 0%, rgba(51,133,214,0.05) 100%); border-radius: 8px; border-left: 4px solid var(--keti-blue);">
+                    <div class="section-title" style="color: var(--keti-blue); margin-top: 0;">⭐ TSN Configuration (VLAN/PCP)</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
+                        <div>
+                            <label>VLAN ID <span style="font-size: 11px; color: var(--text-gray);">(0-4095)</span></label>
+                            <input type="number" id="mz-vlan-id" placeholder="100" value="100" min="0" max="4095">
+                        </div>
+                        <div>
+                            <label>PCP Priority</label>
+                            <select id="mz-pcp">
+                                <option value="0">0 - Best Effort</option>
+                                <option value="1">1 - Background</option>
+                                <option value="2">2 - Excellent Effort</option>
+                                <option value="3">3 - Critical Apps</option>
+                                <option value="4">4 - Video</option>
+                                <option value="5" selected>5 - Voice</option>
+                                <option value="6">6 - Internetwork</option>
+                                <option value="7">7 - Network Control</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Packet Size (B)</label>
+                            <input type="number" id="mz-packet-size" value="1000" min="64" max="1500">
+                        </div>
+                        <div>
+                            <label>Packet Count</label>
+                            <input type="number" id="mz-count" value="1000" min="1" max="1000000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Configuration -->
+                <div style="margin-bottom: 20px;">
+                    <div class="section-title">Advanced Options</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div>
+                            <label>Delay Between Packets</label>
+                            <select id="mz-delay">
+                                <option value="1usec">1 μs (Ultra-fast)</option>
+                                <option value="10usec">10 μs (Very fast)</option>
+                                <option value="100usec">100 μs (Fast)</option>
+                                <option value="1msec" selected>1 ms (Normal)</option>
+                                <option value="10msec">10 ms (Slow)</option>
+                                <option value="100msec">100 ms (Very slow)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Source MAC <span style="font-size: 11px; color: var(--text-gray);">(Optional)</span></label>
+                            <input type="text" id="mz-src-mac" placeholder="Auto-detect">
+                        </div>
+                        <div>
+                            <label>Dest MAC <span style="font-size: 11px; color: var(--text-gray);">(Optional)</span></label>
+                            <input type="text" id="mz-dest-mac" placeholder="Auto-detect">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div id="mausezahn-stats" style="display: none;">
+                    <div class="section-title">Generation Statistics</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Packets Sent</div>
+                            <div class="stat-value" id="mz-stat-packets">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Bytes Sent</div>
+                            <div class="stat-value" id="mz-stat-bytes">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Duration</div>
+                            <div class="stat-value" id="mz-stat-duration">0 s</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Rate</div>
+                            <div class="stat-value" id="mz-stat-rate">0 pps</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traffic Tests Tab -->
+            <div id="tab-traffic-tests" class="tab-content">
+                <div class="control-grid">
+                    <!-- Network Configuration -->
+                    <div class="control-section">
+                        <div class="section-title">Network Configuration</div>
+                        <div class="form-group">
+                            <label>Remote IP</label>
+                            <input type="text" id="remote-ip" value="192.168.1.3" placeholder="192.168.1.3">
+                        </div>
+                    </div>
+
+                    <!-- Test Configuration -->
+                    <div class="control-section" id="generator-config">
+                        <div class="section-title">Test Configuration</div>
+                        <div class="form-group">
+                            <label>Test Type</label>
+                            <select id="test-type" onchange="updateTestConfig()">
+                                <option value="iperf-tcp">iperf3 - TCP Throughput</option>
+                                <option value="iperf-udp">iperf3 - UDP Throughput</option>
+                                <option value="sockperf-pp">sockperf - Ping-Pong</option>
+                                <option value="sockperf-ul">sockperf - Under Load</option>
+                                <option value="sockperf-multisize">sockperf - Multi-Size Latency Table</option>
+                                <option value="ping">Ping - ICMP</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (sec)</label>
+                            <input type="number" id="duration" value="10" min="1" max="3600">
+                        </div>
+                        <div class="form-group" id="bandwidth-group" style="display:none;">
+                            <label>Bandwidth (UDP)</label>
+                            <input type="text" id="bandwidth" value="100M" placeholder="100M, 1G, 10G">
+                        </div>
+                        <div class="form-group" id="msgsize-group" style="display:none;">
+                            <label>Message Size (bytes)</label>
+                            <input type="number" id="msgsize" value="64" min="1" max="65536">
+                        </div>
+
+                        <button class="btn btn-primary" onclick="startTest()">▶ Start Test</button>
+                        <button class="btn btn-danger" onclick="stopTest()">⏹ Stop Test</button>
+                    </div>
+
+                    <!-- Current Results -->
+                    <div class="control-section">
+                        <div class="section-title">Current Results</div>
+                        <div class="stats-grid" id="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Bandwidth</div>
+                                <div class="stat-value" id="stat-bandwidth">0 Mbps</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Latency</div>
+                                <div class="stat-value" id="stat-latency">0 μs</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Jitter</div>
+                                <div class="stat-value" id="stat-jitter">0 ms</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Loss</div>
+                                <div class="stat-value" id="stat-loss">0%</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="exportResults()" style="margin-top: 16px;">💾 Export Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servers Tab -->
+            <div id="tab-servers" class="tab-content">
                 <div class="control-section">
                     <div class="section-title">Server Control</div>
                     <div id="server-controls">
@@ -627,73 +939,9 @@
                         <button class="btn btn-danger btn-compact" onclick="stopServer('sockperf')">Stop sockperf Server</button>
                     </div>
                 </div>
-
-                <!-- Network Configuration -->
-                <div class="control-section">
-                    <div class="section-title">Network Configuration</div>
-                    <div class="form-group">
-                        <label>Remote IP</label>
-                        <input type="text" id="remote-ip" value="192.168.1.3" placeholder="192.168.1.3">
-                    </div>
-                </div>
-
-                <!-- Test Configuration -->
-                <div class="control-section" id="generator-config">
-                    <div class="section-title">Test Configuration</div>
-                    <div class="form-group">
-                        <label>Test Type</label>
-                        <select id="test-type" onchange="updateTestConfig()">
-                            <option value="iperf-tcp">iperf3 - TCP Throughput</option>
-                            <option value="iperf-udp">iperf3 - UDP Throughput</option>
-                            <option value="sockperf-pp">sockperf - Ping-Pong</option>
-                            <option value="sockperf-ul">sockperf - Under Load</option>
-                            <option value="sockperf-multisize">sockperf - Multi-Size Latency Table</option>
-                            <option value="ping">Ping - ICMP</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Duration (sec)</label>
-                        <input type="number" id="duration" value="10" min="1" max="3600">
-                    </div>
-                    <div class="form-group" id="bandwidth-group" style="display:none;">
-                        <label>Bandwidth (UDP)</label>
-                        <input type="text" id="bandwidth" value="100M" placeholder="100M, 1G, 10G">
-                    </div>
-                    <div class="form-group" id="msgsize-group" style="display:none;">
-                        <label>Message Size (bytes)</label>
-                        <input type="number" id="msgsize" value="64" min="1" max="65536">
-                    </div>
-
-                    <button class="btn btn-primary" onclick="startTest()">▶ Start Test</button>
-                    <button class="btn btn-danger" onclick="stopTest()">⏹ Stop Test</button>
-                </div>
-
-                <!-- Results -->
-                <div class="control-section">
-                    <div class="section-title">Current Results</div>
-                    <div class="stats-grid" id="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-label">Bandwidth</div>
-                            <div class="stat-value" id="stat-bandwidth">0 Mbps</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Latency</div>
-                            <div class="stat-value" id="stat-latency">0 μs</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Jitter</div>
-                            <div class="stat-value" id="stat-jitter">0 ms</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Loss</div>
-                            <div class="stat-value" id="stat-loss">0%</div>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-secondary" onclick="exportResults()" style="margin-top: 16px;">💾 Export Results</button>
-                </div>
             </div>
         </div>
+
 
         <!-- Log Console -->
         <div class="log-panel">
