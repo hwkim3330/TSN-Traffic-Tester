@@ -7,6 +7,15 @@ A comprehensive web application for testing and analyzing TSN network performanc
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)
 ![License](https://img.shields.io/badge/License-KETI-orange.svg)
+![Status](https://img.shields.io/badge/Status-Active-success.svg)
+
+## ⚡ Quick Start (One-Liner)
+
+```bash
+git clone https://github.com/hwkim3330/TSN-Traffic-Tester.git && cd TSN-Traffic-Tester && pip3 install -r requirements.txt && ./start.sh
+```
+
+Then open http://localhost:9000 in your browser!
 
 ## ✨ Features
 
@@ -257,11 +266,66 @@ See [LICENSE](LICENSE) for more information.
 - iperf3 and sockperf developers for performance testing tools
 - Mausezahn developers for packet generation
 
+## 📚 Quick Reference
+
+### Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `./start.sh` | Start the application on port 9000 |
+| `python3 app.py --port 8080` | Start on custom port |
+| `PORT=8080 ./start.sh` | Start with environment variable |
+| `pip3 install -r requirements.txt` | Install Python dependencies |
+| `gst-launch-1.0 --version` | Check GStreamer installation |
+| `iperf3 --version` | Check iperf3 installation |
+
+### Default Ports
+
+| Service | Port | Usage |
+|---------|------|-------|
+| Web UI | 9000 | Main application interface |
+| iperf3 | 5201 | Throughput testing |
+| sockperf | 11111 | Latency testing |
+| GStreamer | 5000 | Video streaming (configurable) |
+
+## ❓ FAQ
+
+**Q: Can I run this on Windows?**
+A: This application is designed for Linux (Ubuntu/Debian). For Windows, use WSL2 (Windows Subsystem for Linux).
+
+**Q: Do I need root/sudo access?**
+A: Sudo is required for certain network operations (packet generation, interface configuration). The application uses session-based sudo management for security.
+
+**Q: Can I test between two different machines?**
+A: Yes! Configure one machine as sender and another as receiver. Ensure network connectivity and firewall rules allow traffic on the required ports.
+
+**Q: What's the difference between iperf3 and sockperf?**
+A: iperf3 measures throughput (bandwidth), while sockperf measures latency (round-trip time) with high precision for real-time applications.
+
+**Q: How do I enable TSN priority on my network interface?**
+A: Your network interface must support IEEE 802.1Q VLAN tagging and 802.1Qav/Qbv. Use the VLAN ID and PCP settings in the packet generator or video stream configuration.
+
+**Q: Can I save test results?**
+A: Currently, results are displayed in real-time. You can export charts as images or save logs from the console.
+
+**Q: Why isn't my webcam detected?**
+A: Check that your webcam is at `/dev/video0` or update the device path. Verify permissions with `ls -la /dev/video*` and add your user to the `video` group if needed.
+
 ## 📞 Support
 
 For issues and questions:
 - Open an issue on [GitHub](https://github.com/hwkim3330/TSN-Traffic-Tester/issues)
 - Check existing issues for solutions
+- Read the [documentation](https://github.com/hwkim3330/TSN-Traffic-Tester#readme)
+
+## 🗺️ Roadmap
+
+- [ ] Video performance charts with latency/jitter graphs
+- [ ] Test result export to CSV/JSON
+- [ ] Automated test scheduling
+- [ ] Multi-stream simultaneous testing
+- [ ] Advanced FRER (Frame Replication and Elimination) support
+- [ ] PTP (Precision Time Protocol) integration
 
 ---
 **Made with ❤️ by KETI TSN Research Team** | [GitHub](https://github.com/hwkim3330/TSN-Traffic-Tester) | [Report Bug](https://github.com/hwkim3330/TSN-Traffic-Tester/issues)
